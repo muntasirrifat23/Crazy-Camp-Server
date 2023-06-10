@@ -27,6 +27,16 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
+    // data pass.....................
+    const classCollection = client.db("sportsDB").collection("class");
+
+    app.get('/class', async(req,res)=>{
+      const result = await classCollection.find().toArray();
+      res.send(result);
+    })
+
+
+    //.............................
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment.");
   } finally {
