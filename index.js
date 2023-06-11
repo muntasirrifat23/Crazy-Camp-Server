@@ -30,7 +30,7 @@ async function run() {
     // data pass.....................
     const classCollection = client.db("sportsDB").collection("class");
 
-    app.get('/class', async(req,res)=>{
+    app.get('/instructor', async(req,res)=>{
       const result = await classCollection.find().toArray();
       res.send(result);
     })
