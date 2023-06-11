@@ -28,9 +28,15 @@ async function run() {
     await client.connect();
     // Send a ping to confirm a successful connection
     // data pass.....................
-    const classCollection = client.db("sportsDB").collection("class");
+    const instructorCollection = client.db("sportsDB").collection("instructor");
+    const classCollection = client.db("sportsDB").collection("classes");
 
     app.get('/instructor', async(req,res)=>{
+      const result = await instructorCollection.find().toArray();
+      res.send(result);
+    })
+
+    app.get('/classes', async(req,res)=>{
       const result = await classCollection.find().toArray();
       res.send(result);
     })
