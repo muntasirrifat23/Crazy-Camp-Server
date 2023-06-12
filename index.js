@@ -44,7 +44,7 @@ const { ObjectId } = require('mongodb');
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const instructorCollection = client.db("sportsDB").collection("instructor");
 
@@ -56,6 +56,9 @@ async function run() {
 
     // User
     const userCollection = client.db("sportsDB").collection("user");
+
+    // add
+    const addCollection = client.db("sportsDB").collection("add");
 
     // JWT
     app.post('/jwt', (req, res) => {
@@ -104,6 +107,10 @@ async function run() {
 
     // Get user
     app.get('/user', async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    })
+    app.get('/add', async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     })
