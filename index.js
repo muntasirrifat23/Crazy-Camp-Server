@@ -69,6 +69,12 @@ async function run() {
       res.send(result)
     })
 
+    // Get user
+    app.get('/user', async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    })
+
     // post user
     app.post('/user', async (req, res) => {
       const userClass = req.body;
@@ -77,7 +83,7 @@ async function run() {
       const alreadyUser= await userCollection.findOne(query);
       if (alreadyUser){
         return res.send({message:'This user already have'})
-      }
+      } 
 
       const result = await userCollection.insertOne(userClass);
       res.send(result)
