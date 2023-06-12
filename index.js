@@ -85,8 +85,21 @@ async function run() {
         return res.send({message:'This user already have'})
       } 
 
-      const result = await userCollection.insertOne(userClass);
-      res.send(result)
+      //user patch
+      app.patch('/user/admin/:id', async(req,res) =>{
+        const id = req.params.id;
+        console.log(id);
+        const filter = {_id:new ObjectId(id)};
+        const updateRole={
+          $set:{
+            role: 'admin'
+          },
+        };
+        const result = await userCollection.updateOne(filter,updateRole);
+        res.send(result);
+      })
+      // const result = await userCollection.insertOne(userClass);
+      // res.send(result)
     })
 
 
