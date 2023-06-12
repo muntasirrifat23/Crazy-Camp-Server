@@ -84,8 +84,11 @@ async function run() {
       if (alreadyUser){
         return res.send({message:'This user already have'})
       } 
+      const result = await userCollection.insertOne(userClass);
+      res.send(result);
+    })
 
-      //user patch
+      //user admin patch
       app.patch('/user/admin/:id', async(req,res) =>{
         const id = req.params.id;
         console.log(id);
@@ -98,9 +101,19 @@ async function run() {
         const result = await userCollection.updateOne(filter,updateRole);
         res.send(result);
       })
-      // const result = await userCollection.insertOne(userClass);
-      // res.send(result)
-    })
+      //user instructor patch
+      app.patch('/user/instructor/:id', async(req,res) =>{
+        const id = req.params.id;
+        console.log(id);
+        const filter = {_id:new ObjectId(id)};
+        const updateInstructor={
+          $set:{
+            role: 'instructor'
+          },
+        };
+        const result = await userCollection.updateOne(filter,updateInstructor);
+        res.send(result);
+      })
 
 
     // Delete
