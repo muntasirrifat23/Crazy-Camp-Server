@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = process.env.Port||5000;
+const port = process.env.PORT||5000;
 const cors = require('cors')
 require('dotenv').config();
 app.use(express.json())
@@ -21,6 +21,7 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+const { ObjectId } = require('mongodb');
 
 async function run() {
   try {
@@ -56,16 +57,17 @@ async function run() {
         res.send(result);
       })
   
-      // Post
+    // Post
       app.post('/enroll', async (req, res) => {
         const enrollClass = req.body;
         // console.log(enrollClass);
         const result = await enrollCollection.insertOne(enrollClass);
         res.send(result)
       })
-       // Delete
+    // Delete
     app.delete('/enroll/:id', async(req,res)=>{
       const id= req.params.id;
+      console.log(id);
       const query= {_id:new ObjectId(id)};
       const result= await enrollCollection.deleteOne(query);
       res.send(result);
