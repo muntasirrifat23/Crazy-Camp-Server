@@ -1,10 +1,28 @@
 const express = require('express')
 const app = express()
+const jwt = require('jsonwebtoken');
+
 const port = process.env.PORT || 5000;
 const cors = require('cors')
 require('dotenv').config();
 app.use(express.json())
 app.use(cors());
+
+// JWT
+const verifyJWT=(req,res,next) =>{
+  const authorization =req.headers.authorization;
+  if(!authorization){
+    return res.status(401).send({ error: true, message: 'not valid user'});
+  }
+  const token = authorization.split(' ')[1];
+  jwt.verify(token, process.env.TOKEN_SECRET,(error,secure)=>{
+    if (error){
+      return res.status(401).send({error: true, message: 'not valid user'})
+    }
+    req.secure =secure;
+    next();
+  })
+}
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -39,6 +57,21 @@ async function run() {
     // User
     const userCollection = client.db("sportsDB").collection("user");
 
+    // JWT
+    app.post('/jwt', (req, res) => {
+      const user=req.body;
+      const token =jwt.sign(user,process.env.TOKEN_SECRET);
+      res.send({token});
+    })
+    const verifyAdmin= async(req,res,next)=>{
+      const email =req.decoded.email;
+      const query ={ email: email }
+      const user= await userCollection.findOne(query);
+      if (user?.role !== 'admin') {
+        return res.status(404).send({ error: true, message: 'enter valid user' });
+      }
+      next();
+    }
     app.get('/instructor', async (req, res) => {
       const result = await instructorCollection.find().toArray();
       res.send(result);
@@ -70,7 +103,7 @@ async function run() {
     })
 
     // Get user
-    app.get('/user', async (req, res) => {
+    app.get('/user', verifyJWT, verifyAdmin, async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     })
@@ -85,6 +118,19 @@ async function run() {
         return res.send({message:'This user already have'})
       } 
       const result = await userCollection.insertOne(userClass);
+      res.send(result);
+    })
+    // get  to do
+    app.get('/user/admin/:email', verifyJWT, async (req, res) => {
+      const email = req.params.email;
+
+      if (req.decoded.email !== email) {
+        res.send({ admin: false })
+      }
+
+      const query = { email: email }
+      const adminUSer = await userCollection.findOne(query);
+      const result = { admin:adminUSer?.role === 'admin' }
       res.send(result);
     })
 
