@@ -26,10 +26,13 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
-    // data pass.....................
+    
     const instructorCollection = client.db("sportsDB").collection("instructor");
+
     const classCollection = client.db("sportsDB").collection("classes");
+
+    // Enrol
+    const enrollCollection = client.db("sportsDB").collection("enroll");
 
     app.get('/instructor', async(req,res)=>{
       const result = await instructorCollection.find().toArray();
@@ -40,6 +43,33 @@ async function run() {
       const result = await classCollection.find().toArray();
       res.send(result);
     })
+    // ....................
+      // Get class
+      app.get('/enroll', async(req,res)=>{
+        const email= req.query.email;
+        console.log(email);
+        if(!email){
+          res.send([]);
+        }
+        const query={email:email};
+        const result = await enrollCollection.find(query).toArray();
+        res.send(result);
+      })
+  
+      // Post
+      app.post('/enroll', async (req, res) => {
+        const enrollClass = req.body;
+        // console.log(enrollClass);
+        const result = await enrollCollection.insertOne(enrollClass);
+        res.send(result)
+      })
+    //    // Delete
+    // app.delete('/enroll/:id', async(req,res)=>{
+    //   const id= req.params.id;
+    //   const query= {_id:new ObjectId(id)};
+    //   const result= await enrollCollection.deleteOne(query);
+    //   res.send(result);
+    // })
 
 
     //.............................
