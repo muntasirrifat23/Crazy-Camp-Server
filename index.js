@@ -64,10 +64,10 @@ async function run() {
       res.send({token});
     })
     const verifyAdmin= async(req,res,next)=>{
-      const email =req.decoded.email;
+      const email =req.secure.email;
       const query ={ email: email }
       const user= await userCollection.findOne(query);
-      if (user?.role !== 'admin') {
+      if (user?.role!=='admin') {
         return res.status(404).send({ error: true, message: 'enter valid user' });
       }
       next();
@@ -89,7 +89,7 @@ async function run() {
       if (!email) {
         res.send([]);
       }
-      const query = { email: email };
+      const query={email:email};
       const result = await enrollCollection.find(query).toArray();
       res.send(result);
     })
@@ -103,7 +103,7 @@ async function run() {
     })
 
     // Get user
-    app.get('/user', verifyJWT, verifyAdmin, async (req, res) => {
+    app.get('/user', async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     })
@@ -121,14 +121,12 @@ async function run() {
       res.send(result);
     })
     // get  to do
-    app.get('/user/admin/:email', verifyJWT, async (req, res) => {
-      const email = req.params.email;
-
-      if (req.decoded.email !== email) {
-        res.send({ admin: false })
+    app.get('/user/admin/:email',verifyJWT,async (req,res)=>{
+      const email=req.params.email;
+      if (req.secure.email!= email) {
+        res.send({admin:false})
       }
-
-      const query = { email: email }
+      const query ={email:email}
       const adminUSer = await userCollection.findOne(query);
       const result = { admin:adminUSer?.role === 'admin' }
       res.send(result);
